@@ -58,19 +58,24 @@ class ApplicationService {
 
 
     public async updateApplication(id: string, applicationData: ApplicationUpdateData): Promise<Application | null> {
-        const validEntries = Object.entries(applicationData)
-            .filter(([, value]) => value !== undefined); // Filter out undefined values
-        if (validEntries.length === 0) {
-            // If no fields to update, maybe return the existing application or throw an error
+        // Assert the type of keys
+        const validKeys = Object.keys(applicationData) as Array<keyof ApplicationUpdateData>;
+
+        const fields = validKeys
+            .filter(key => applicationData[key] !== undefined);// Now key is keyof ApplicationUpdateData
+
+        if (fields.length === 0) {
+             console.warn(`No valid fields provided for updating application id ${id}`);
              return this.getApplicationById(id);
         }
 
-        const setClause = validEntries
-            .map((key, index) => `"${key}" = $${index + 2}`) // Start parameters from $2 ($1 is the id)
+        const setClause = fields
+            .map((key, index) => `${key} = $${index + 2}`)
             .join(', ');
 
-        const values = validEntries.map(([, value]) => value);
-        values.unshift(id); // Add the id as the first parameter ($1)
+        // Accessing applicationData[key] is now type-safe
+        const values = fields.map(key => applicationData[key]);
+        values.unshift(id);
 
         const query = `
             UPDATE applications
@@ -80,6 +85,8 @@ class ApplicationService {
         `;
 
         try {
+            console.log('Executing update query:', query);
+            console.log('With values:', values);
             const result: QueryResult<Application> = await pool.query(query, values);
              if (result.rows.length > 0) {
                 return result.rows[0];
@@ -87,10 +94,21 @@ class ApplicationService {
                 return null;
             }
         } catch (error) {
-            console.error(`Error updating application with id ${id}:`, error);
-            throw new Error("Failed to update application in database.");
+            let errorMessage = "Failed to update application in database.";
+            if (error instanceof Error) {
+                // Now it's safe to access error.message
+                errorMessage += ` Original error: ${error.message}`;
+                console.error(`Error updating application with id ${id}:`, error.message);
+                console.error('Stack trace:', error.stack); // Log stack for more details
+            } else {
+                // Handle cases where the thrown value isn't an Error object
+                console.error(`An unexpected error occurred while updating application with id ${id}:`, error);
+                errorMessage += ` Unexpected error: ${String(error)}`;
+            }
+            throw new Error(errorMessage);
         }
     }
+
 
     public async deleteApplication(id: string): Promise<boolean> {
         const query = 'DELETE FROM applications WHERE id = $1;';
