@@ -1,9 +1,8 @@
 import { pool } from '../config/db';
 import { User, UserCreationData } from '../models/User';
 import bcrypt from 'bcrypt';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'; // Import Secret type
 import { QueryResult } from 'pg';
-import { STRING } from 'sequelize';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
@@ -65,12 +64,12 @@ class AuthService {
             throw new Error('Invalid username or password.');
         }
 
-        const payload = { userId: user.id, username: user.username };
-
-        // Remove the explicit SignOptions type and cast, use the variable
-        
-        const token = jwt.sign(payload, JWT_SECRET as string);
-
+        //Error at generating token
+        const token = jwt.sign(
+            {userId: user.id, username: user.username},
+            JWT_SECRET as string, 
+            { expiresIn: JWT_EXPIRES_IN }
+        );
 
         const { password: _, ...userWithoutPassword } = user;
         return { token, user: userWithoutPassword };
