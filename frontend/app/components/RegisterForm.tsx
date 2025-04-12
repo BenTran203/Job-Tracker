@@ -1,7 +1,6 @@
-
 import React, { useState, FormEvent } from 'react';
-// Import the register function from your API service
-import { registerUser } from '../../services/api'; // Adjust path as needed
+import '../styles/AuthForms.scss';
+import { registerUser } from '../../services/api'; 
 
 interface RegisterFormProps {
     onRegisterSuccess: () => void; 
@@ -88,12 +87,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegisterSuccess, switchTo
             <button type="submit" disabled={loading}>
                 {loading ? 'Registering...' : 'Register'}
             </button>
-             <p>
-                Already have an account?{' '}
-                <button type="button" onClick={switchToLogin} disabled={loading}>
-                    Login here
-                </button>
-            </p>
         </form>
     );
 };

@@ -37,8 +37,8 @@ export default function HomePage() {
 
         // Define the async function to fetch data
         const fetchApplications = async () => {
-            setDataLoading(true); // Indicate data fetching has started
-            setError(null);       // Clear previous errors
+            setDataLoading(true);
+            setError(null);      
             try {
                 console.log("Attempting to fetch applications...");
                 const data = await getApplications();
@@ -60,13 +60,12 @@ export default function HomePage() {
         };
 
         if (isAuthenticated) {
-            // Only fetch if the user is authenticated
             fetchApplications();
         } else {
             // If the user is not authenticated (or logs out), clear the data and errors
             setApplications([]);
             setError(null); // Clear errors related to data fetching
-            setDataLoading(false); // Ensure loading is off
+            setDataLoading(false); 
         }
 
         // Rerun effect if authentication status or loading status changes
@@ -82,23 +81,15 @@ export default function HomePage() {
         setShowLogin(true);
     };
     const handleRegisterSuccess = () => {
-        // After successful registration, switch back to the login form
-        // Optionally show a success message
         alert("Registration successful! Please log in."); // Simple feedback
         setShowLogin(true);
     };
-    // Note: handleLoginSuccess is not strictly needed here as the context handles
-    // the state update, and the useEffect will trigger data fetching.
-    // You could add it if you need specific UI feedback on login.
-
-    // --- Render Logic ---
 
     // 1. Show primary loading indicator while checking auth status
     if (isAuthLoading) {
         return (
             <div style={{ textAlign: 'center', padding: '50px' }}>
                 <p>Loading session...</p>
-                {/* You could add a spinner component here */}
             </div>
         );
     }
@@ -108,7 +99,6 @@ export default function HomePage() {
         return (
             <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
                 <h2>Welcome</h2>
-                {/* Display general errors (e.g., from failed login attempts if LoginForm sets them via context/callback) */}
                  {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
                 {showLogin ? (
@@ -117,8 +107,7 @@ export default function HomePage() {
                             throw new Error('Function not implemented.');
                         } } switchToRegister={function (): void {
                             throw new Error('Function not implemented.');
-                        } }                            // Pass setError if LoginForm needs to report errors back to this page
-                            // onError={setError}
+                        } }                            
                         />
                         <p style={{ marginTop: '15px', textAlign: 'center' }}>
                             Don't have an account?{' '}

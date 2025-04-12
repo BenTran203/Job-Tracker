@@ -1,6 +1,5 @@
-
+import '../styles/AuthForms.scss'; 
 import React, { useState, FormEvent } from 'react';
-// Import the login function from your API service
 import { loginUser } from '../../services/api'; // Adjust path as needed
 
 interface LoginFormProps {
@@ -67,12 +66,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, switchToRegister 
             <button type="submit" disabled={loading}>
                 {loading ? 'Logging in...' : 'Login'}
             </button>
-            <p>
-                Don't have an account?{' '}
-                <button type="button" onClick={switchToRegister} disabled={loading}>
-                    Register here
-                </button>
-            </p>
         </form>
     );
 };

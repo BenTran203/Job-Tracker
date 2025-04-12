@@ -1,25 +1,21 @@
 'use client';
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { loginUser as apiLogin, logoutUser as apiLogout } from '../services/api'; // Assuming api.ts exports these
 
-// Define the shape of the user object (adjust based on your backend response)
 interface User {
     id: number;
     username: string;
-    // Add other relevant user fields
 }
 
 // Define the shape of the context data
 interface AuthContextType {
     isAuthenticated: boolean;
     user: User | null;
-    isLoading: boolean; // To handle initial check
-    login: (credentials: any) => Promise<void>; // Adjust 'any' to your credentials type
+    isLoading: boolean; 
+    login: (credentials: any) => Promise<void>; 
     logout: () => void;
 }
 
-// Create the context with a default value (can be undefined or null initially)
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Create the provider component
@@ -38,13 +34,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const userInfo = localStorage.getItem('userInfo');
         if (token && userInfo) {
             try {
-                // Basic check: If token exists, assume authenticated for initial load.
-                // A better check would involve verifying the token with the backend.
                 setIsAuthenticated(true);
                 setUser(JSON.parse(userInfo));
             } catch (error) {
                 console.error("Failed to parse user info from localStorage", error);
-                // Clear invalid storage if parsing fails
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('userInfo');
             }
@@ -64,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             localStorage.removeItem('authToken');
             localStorage.removeItem('userInfo');
             console.error("Login failed in context:", error);
-            throw error; // Re-throw error so the form can handle it
+            throw error; 
         }
     };
 
@@ -72,10 +65,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         apiLogout(); // apiLogout handles localStorage removal
         setIsAuthenticated(false);
         setUser(null);
-        // Optionally redirect to login page or home page
     };
 
-    // Value provided to consuming components
     const value = {
         isAuthenticated,
         user,
