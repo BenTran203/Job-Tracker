@@ -5,6 +5,7 @@ import { getApplications } from '../services/api'; // Adjust path if needed
 import LoginForm from './components/LoginForm'; // Adjust path if needed
 import RegisterForm from './components/RegisterForm'; // Adjust path if needed
 import { useAuth } from '../services/AuthContext'; // Use the custom hook
+import '../app/styles/AuthForms.scss'; // Adjust path if needed
 
 // Define an interface for the application data matching your backend model
 interface Application {
@@ -97,17 +98,17 @@ export default function HomePage() {
     // 2. Render Login/Register view if user is NOT authenticated
     if (!isAuthenticated) {
         return (
-            <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+            <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: 'px solid #ccc', borderRadius: '8px', backgroundColor: 'white' }}>
                 <h2>Welcome</h2>
                  {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
                 {showLogin ? (
                     <>
-                        <LoginForm onLoginSuccess={function (): void {
-                            throw new Error('Function not implemented.');
-                        } } switchToRegister={function (): void {
-                            throw new Error('Function not implemented.');
-                        } }                            
+                        <LoginForm onLoginSuccess={() => {
+                            alert("Login successful!"); // Need more research on this
+                            setShowLogin(false);  
+                        }} 
+                        switchToRegister={switchToRegister}                         
                         />
                         <p style={{ marginTop: '15px', textAlign: 'center' }}>
                             Don't have an account?{' '}
@@ -118,10 +119,10 @@ export default function HomePage() {
                     </>
                 ) : (
                     <>
-                        <RegisterForm onRegisterSuccess={handleRegisterSuccess} switchToLogin={function (): void {
-                                throw new Error('Function not implemented.');
-                            } } />
-                        <p style={{ marginTop: '15px', textAlign: 'center' }}>
+                        <RegisterForm onRegisterSuccess={handleRegisterSuccess}   
+                        switchToLogin={switchToLogin}  
+                        />
+                        <p style={{ marginTop: '15px', textAlign: 'center'}}>
                             Already have an account?{' '}
                             <button onClick={switchToLogin} style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}>
                                 Login here
