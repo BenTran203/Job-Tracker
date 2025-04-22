@@ -1,24 +1,17 @@
 "use client"; // Required for hooks
 
 import React, { useState, useEffect } from "react";
-import { getApplications, deleteApplication } from "../services/api"; // Adjust path if needed
+import { getApplications, deleteApplication, updateApplication } from "../services/api"; // Import Application type
 import LoginForm from "./components/LoginForm"; // Adjust path if needed
 import RegisterForm from "./components/RegisterForm"; // Adjust path if needed
 import { useAuth } from "../services/AuthContext"; // Use the custom hook
 import ApplicationForm from "./components/ApplicationForm";
 import "../app/styles/AuthForms.scss"; // Adjust path if needed
 
-interface Application {
-  id: number;
-  company_name: string;
-  job_title: string;
-  status: string;
-  application_date: string; // Or Date
-  // Add other fields as needed
-}
 
 export default function HomePage() {
   // Authentication state from context
+  const [editingApplication, setEditingApplication] = useState<Application | null>(null); // Store the app being edited
   const { isAuthenticated, user, logout, isLoading: isAuthLoading } = useAuth();
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -106,9 +99,11 @@ export default function HomePage() {
     setError(null);
     console.log("Login successful handler called in HomePage.");
   };
-  // ... inside HomePage component ...
+  const handleEditClick = (application: Application) => {
+    setEditingApplication(application); 
+    setShowAddForm(false);
 
-  // 1. Show primary loading indicator while checking auth status
+};
   if (isAuthLoading) {
     return (
       <div style={{ textAlign: "center", padding: "50px" }}>
@@ -182,6 +177,7 @@ export default function HomePage() {
     );
   }
 
+
   return (
     <div>
       <div
@@ -253,9 +249,12 @@ export default function HomePage() {
                   {/* TODO: Add more details if needed */}
                 </div>
                 <div>
-                  {" "}
-                  {/* Group buttons */}
-                  {/* TODO: Add Edit button here */}
+                <button
+                        onClick={() => handleEditClick(app)} // Pass the whole app object
+                        style={{ background: '#ffc107', color: 'black', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        Edit
+                    </button>
                   <button
                     onClick={() => deleteApplication(app.id)} // Call handler with app ID
                     style={{

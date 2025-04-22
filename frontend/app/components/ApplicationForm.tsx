@@ -1,33 +1,46 @@
 'use client';
 
-import React, { useState, FormEvent } from 'react';
-import { createApplication } from '../../services/api'; 
+import React, { useState, FormEvent, useEffect } from 'react';
+// Import both create and update API functions
+import { createApplication, updateApplication } from '../../services/api'; // Adjust path if needed
 
-// Define the shape of the data the form handles, based on ApplicationCreationData
 interface ApplicationFormData {
     company_name: string;
     job_title: string;
     status?: string;
-    application_date?: string; 
+    application_date?: string;
     job_description?: string;
     notes?: string;
     url?: string;
 }
 
-// Define props for the component, including a success callback
-interface ApplicationFormProps {
-    onSuccess: (newApplication: any) => void; // Callback when creation is successful, passing the new app data
-    onCancel?: () => void; 
+interface Application {
+    id: number; 
+    company_name: string;
+    job_title: string;
+    status?: string;
+    application_date?: string | Date;
+    job_description?: string;
+    notes?: string;
+    url?: string;
 }
 
-// Define possible status options (customize as needed)
+
+interface ApplicationFormProps {
+    onSuccess: (updatedOrNewApplication: Application) => void; // Callback with the result
+    onCancel?: () => void;
+    initialData?: Application | null; // Optional data for editing
+}
+
 const STATUS_OPTIONS = ['Applied', 'Interviewing', 'Offer', 'Rejected', 'Wishlist', 'Other'];
 
-const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSuccess, onCancel }) => {
+const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSuccess, onCancel, initialData }) => {
+    const isEditing = !!initialData; // Determine if we are in edit mode
+
     const [formData, setFormData] = useState<ApplicationFormData>({
         company_name: '',
         job_title: '',
-        status: STATUS_OPTIONS[0], 
+        status: STATUS_OPTIONS[0],
         application_date: new Date().toISOString().split('T')[0],
         job_description: '',
         notes: '',
@@ -37,39 +50,26 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSuccess, onCancel }
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    // Handle input changes
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData(prevData => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+    // Effect to populate form when initialData is provided (for editing)
+    useEffect(() => {
+        if (isEditing && initialData) {
+            // Format date correctly for the input type="date" (YYYY-MM-DD)
+            const formattedDate = initialData.application_date
+                ? new Date(initialData.application_date).toISOString().split('T')[0]
+                : new Date().toISOString().split('T')[0];
 
-    // Handle form submission
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setError(null);
-        setLoading(true);
-
-        // Basic validation (add more as needed)
-        if (!formData.company_name || !formData.job_title) {
-            setError('Company Name and Job Title are required.');
-            setLoading(false);
-            return;
-        }
-
-        try {
-            console.log('Submitting application data:', formData);
-            // Call the API function from api.ts
-            const newApplication = await createApplication(formData);
-            console.log('Application created successfully:', newApplication);
-
-            // Call the success callback passed from the parent
-            onSuccess(newApplication);
-
-            // Optionally reset the form after successful submission
             setFormData({
+                company_name: initialData.company_name || '',
+                job_title: initialData.job_title || '',
+                status: initialData.status || STATUS_OPTIONS[0],
+                application_date: formattedDate,
+                job_description: initialData.job_description || '',
+                notes: initialData.notes || '',
+                url: initialData.url || '',
+            });
+        } else {
+             // Reset form if initialData is removed (e.g., cancel edit)
+             setFormData({
                 company_name: '',
                 job_title: '',
                 status: STATUS_OPTIONS[0],
@@ -78,10 +78,51 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSuccess, onCancel }
                 notes: '',
                 url: '',
             });
+        }
+    }, [initialData, isEditing]); // Rerun effect if initialData changes
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        // ... handleChange remains the same ...
+        const { name, value } = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setError(null);
+        setLoading(true);
+
+        if (!formData.company_name || !formData.job_title) {
+            // ... validation remains the same ...
+            setError('Company Name and Job Title are required.');
+            setLoading(false);
+            return;
+        }
+
+        try {
+            let resultApplication: Application;
+            if (isEditing && initialData) {
+                // --- UPDATE ---
+                console.log('Submitting updated application data:', formData);
+                resultApplication = await updateApplication(initialData.id, formData); // Pass ID and data
+                console.log('Application updated successfully:', resultApplication);
+            } else {
+                // --- CREATE ---
+                console.log('Submitting new application data:', formData);
+                resultApplication = await createApplication(formData);
+                console.log('Application created successfully:', resultApplication);
+            }
+
+            onSuccess(resultApplication); // Pass the result (updated or new) to the parent
+
+            // No need to reset form here if parent hides it via onCancel/onSuccess
 
         } catch (err: any) {
-            console.error('Failed to create application:', err);
-            setError(err.response?.data?.message || err.message || 'Failed to save application. Please try again.');
+            console.error(`Failed to ${isEditing ? 'update' : 'create'} application:`, err);
+            setError(err.response?.data?.message || err.message || `Failed to save application. Please try again.`);
         } finally {
             setLoading(false);
         }
@@ -89,9 +130,11 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSuccess, onCancel }
 
     return (
         <form onSubmit={handleSubmit} style={{ border: '1px solid #eee', padding: '20px', borderRadius: '8px', marginTop: '20px', marginBottom: '20px' }}>
-            <h3>Add New Application</h3>
+            {/* Change title based on mode */}
+            <h3>{isEditing ? 'Edit Application' : 'Add New Application'}</h3>
             {error && <p style={{ color: 'red' }}>{error}</p>}
 
+            {/* ... Form fields remain the same (company_name, job_title, etc.) ... */}
             {/* Company Name */}
             <div>
                 <label htmlFor="company_name">Company Name:</label>
@@ -189,12 +232,13 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSuccess, onCancel }
                 />
             </div>
 
+
             {/* Buttons */}
             <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
                 <button type="submit" disabled={loading}>
-                    {loading ? 'Saving...' : 'Save Application'}
+                    {loading ? 'Saving...' : (isEditing ? 'Update Application' : 'Save Application')}
                 </button>
-                {onCancel && ( // Only show Cancel button if onCancel prop is provided
+                {onCancel && (
                     <button type="button" onClick={onCancel} disabled={loading}>
                         Cancel
                     </button>
