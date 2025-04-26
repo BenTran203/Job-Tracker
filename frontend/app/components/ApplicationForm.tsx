@@ -14,7 +14,7 @@ interface ApplicationFormData {
     url?: string;
 }
 
-interface Application {
+export interface Application {
     id: number; 
     company_name: string;
     job_title: string;
@@ -24,7 +24,6 @@ interface Application {
     notes?: string;
     url?: string;
 }
-
 
 interface ApplicationFormProps {
     onSuccess: (updatedOrNewApplication: Application) => void; // Callback with the result
@@ -115,10 +114,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSuccess, onCancel, 
                 resultApplication = await createApplication(formData);
                 console.log('Application created successfully:', resultApplication);
             }
-
-            onSuccess(resultApplication); // Pass the result (updated or new) to the parent
-
-            // No need to reset form here if parent hides it via onCancel/onSuccess
+            onSuccess(resultApplication); 
 
         } catch (err: any) {
             console.error(`Failed to ${isEditing ? 'update' : 'create'} application:`, err);

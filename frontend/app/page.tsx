@@ -1,17 +1,19 @@
 "use client"; // Required for hooks
 
 import React, { useState, useEffect } from "react";
-import { getApplications, deleteApplication, updateApplication } from "../services/api"; // Import Application type
+import { updateApplication as apiUpdateApplication } from "../services/api"; // Import update function
+import { getApplications, deleteApplication } from "../services/api"; // Import Application type
 import LoginForm from "./components/LoginForm"; // Adjust path if needed
 import RegisterForm from "./components/RegisterForm"; // Adjust path if needed
 import { useAuth } from "../services/AuthContext"; // Use the custom hook
 import ApplicationForm from "./components/ApplicationForm";
+import type { Application } from "./components/ApplicationForm"; // Import the TYPE here
 import "../app/styles/AuthForms.scss"; // Adjust path if needed
-
 
 export default function HomePage() {
   // Authentication state from context
-  const [editingApplication, setEditingApplication] = useState<Application | null>(null); // Store the app being edited
+  const [editingApplication, setEditingApplication] =
+    useState<Application | null>(null); // Store the app being edited
   const { isAuthenticated, user, logout, isLoading: isAuthLoading } = useAuth();
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -62,27 +64,68 @@ export default function HomePage() {
     setShowAddForm(false);
     console.log("New application added to the list:", newApplication);
   };
-  const handleDeleteApplication = async (id: number) => {
-    // Confirmation dialog
-    if (!window.confirm(`Are you sure you want to delete this application (ID: ${id})?`)) {
-        return; // Stop if user cancels
-    }
+// Inside HomePage component
 
-    try {
-        await deleteApplication(id); // Call the API function
-        setApplications(prevApps => prevApps.filter(app => app.id !== id));
-        console.log(`Application with ID ${id} deleted successfully.`);
+const handleDeleteApplication = async (id: number) => {
+  if (
+      !window.confirm(
+          `Are you sure you want to delete this application (ID: ${id})?`
+      )
+  ) {
+      return; // Stop if user cancels
+  }
 
-    } catch (err: any) {
-        console.error(`Failed to delete application with ID ${id}:`, err);
-        setError(err.response?.data?.message || err.message || `Failed to delete application.`);
-    } finally {}
+  // Clear previous errors/messages before starting
+  setError(null);
+  // setSuccessMessage(null); // If you add a success message state
+
+  console.log(`Attempting to delete application ID: ${id}`); // Log start
+
+  try {
+      // 1. Call the API function
+      await deleteApplication(id);
+      console.log(`API call for delete ID: ${id} completed.`); // Log success step 1
+
+      // 2. Update the state (THIS IS KEY FOR IMMEDIATE UI UPDATE)
+      setApplications((prevApps) => {
+          console.log('Current applications state:', prevApps); // Log previous state
+          const nextApps = prevApps.filter((app) => app.id !== id);
+          console.log('New applications state (after filter):', nextApps); // Log next state
+          return nextApps; // Return the new array without the deleted item
+      });
+
+      // 3. Provide success feedback (Optional but recommended)
+      console.log(`Application with ID ${id} deleted successfully from state.`);
+      // You could set a temporary success message state here
+      // setSuccessMessage(`Application ${id} successfully deleted!`);
+      // setTimeout(() => setSuccessMessage(null), 3000); // Clear after 3s
+
+  } catch (err: any) {
+      // 4. Handle errors IF the API call failed
+      console.error(`Failed to delete application with ID ${id}:`, err); // Log the full error object
+      console.error('Error status:', err.response?.status); // Log status code if available
+      console.error('Error data:', err.response?.data);   // Log response data if available
+
+      let errorMsg = `Failed to delete application.`;
+      if (err.response?.status === 404 || err.message?.includes('not found')) {
+          errorMsg = `Failed to delete: Application with ID ${id} not found. It may have already been deleted.`;
+          // Refresh list if desired when not found
+          // fetchApplications();
+      } else {
+          // Use more specific error from backend if available
+          errorMsg = err.response?.data?.message || err.message || errorMsg;
+      }
+      setError(errorMsg); // Set the error state to display it
+
+  } finally {
+      // Optional: handle loading states if you have them
+      // setLoading(false);
+  }
 };
-
+  // handle function
   const handleCancelAddForm = () => {
-    setShowAddForm(false); // Simply hide the form
+    setShowAddForm(false);
   };
-
   const switchToRegister = () => {
     setError(null);
     setShowLogin(false);
@@ -99,11 +142,40 @@ export default function HomePage() {
     setError(null);
     console.log("Login successful handler called in HomePage.");
   };
-  const handleEditClick = (application: Application) => {
-    setEditingApplication(application); 
-    setShowAddForm(false);
 
-};
+  // Function to handle the edit button click
+  const handleEditClick = (application: Application) => {
+    setEditingApplication(application);
+    setShowAddForm(false);
+  };
+  const handleUpdateSuccess = (updatedApplication: Application) => {
+    setApplications((prevApps) =>
+      prevApps.map((app) =>
+        app.id === updatedApplication.id ? updatedApplication : app
+      )
+    );
+    setEditingApplication(null);
+    console.log(
+      "Application updated successfully in list:",
+      updatedApplication
+    );
+  };
+  const handleCancelEdit = () => {
+    setEditingApplication(null); // Exit editing mode without saving
+  };
+  const handleApplicationUpdated = (updatedApplication: Application) => {
+    setApplications((prevApps) =>
+      prevApps.map((app) =>
+        app.id === updatedApplication.id ? updatedApplication : app
+      )
+    );
+    setEditingApplication(null);
+    console.log(
+      "Application updated successfully in list:",
+      updatedApplication
+    );
+  };
+
   if (isAuthLoading) {
     return (
       <div style={{ textAlign: "center", padding: "50px" }}>
@@ -177,7 +249,6 @@ export default function HomePage() {
     );
   }
 
-
   return (
     <div>
       <div
@@ -196,17 +267,31 @@ export default function HomePage() {
           </button>
         </div>
       </div>
-      {!showAddForm ? (
+
+      {!showAddForm && !editingApplication && (
         <button
-          onClick={() => setShowAddForm(true)}
+          onClick={() => {
+            setShowAddForm(true);
+            setEditingApplication(null);
+            setError(null);
+          }}
           style={{ marginBottom: "20px" }}
         >
           + Add New Application
         </button>
-      ) : (
+      )}
+      {showAddForm && !editingApplication && (
         <ApplicationForm
-          onSuccess={handleApplicationCreated}
-          onCancel={handleCancelAddForm} // Pass the cancel handler
+          onSuccess={handleApplicationCreated} // Use the update handler
+          onCancel={handleCancelAddForm}
+        />
+      )}
+      {editingApplication && (
+        <ApplicationForm
+          key={editingApplication.id}
+          initialData={editingApplication}
+          onSuccess={handleApplicationUpdated}
+          onCancel={handleCancelEdit}
         />
       )}
 
@@ -244,19 +329,31 @@ export default function HomePage() {
                   <br />
                   <small>
                     Applied on:{" "}
-                    {new Date(app.application_date).toLocaleDateString()}
+                    {/* Check if app.application_date exists before creating Date */}
+                    {
+                      app.application_date
+                        ? new Date(app.application_date).toLocaleDateString()
+                        : "N/A"
+                    }
                   </small>
                   {/* TODO: Add more details if needed */}
                 </div>
                 <div>
-                <button
-                        onClick={() => handleEditClick(app)} // Pass the whole app object
-                        style={{ background: '#ffc107', color: 'black', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                        Edit
-                    </button>
                   <button
-                    onClick={() => deleteApplication(app.id)} // Call handler with app ID
+                    onClick={() => handleEditClick(app)} // Pass the whole app object
+                    style={{
+                      background: "#ffc107",
+                      color: "black",
+                      border: "none",
+                      padding: "5px 10px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteApplication(app.id)} // Call handler with app ID
                     style={{
                       marginLeft: "10px",
                       background: "#dc3545",
