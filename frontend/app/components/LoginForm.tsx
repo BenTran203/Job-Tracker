@@ -1,6 +1,6 @@
 import '../styles/AuthForms.scss'; 
 import React, { useState, FormEvent } from 'react';
-import { loginUser } from '../../services/api'; // Adjust path as needed
+import { loginUser } from '../services/api'; // Adjust path as needed
 
 interface LoginFormProps {
     onLoginSuccess: () => void; // Callback function for successful login

@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import '../styles/AuthForms.scss';
-import { registerUser } from '../../services/api'; 
+import { registerUser } from '../services/api'; 
 
 interface RegisterFormProps {
     onRegisterSuccess: () => void; 

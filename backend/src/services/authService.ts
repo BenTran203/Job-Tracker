@@ -1,15 +1,16 @@
 import { pool } from '../config/db';
 import { User, UserCreationData } from '../models/User';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'; // Import Secret type
+import jwt, {Secret} from 'jsonwebtoken'; // Import Secret type
 import { QueryResult } from 'pg';
 
-const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 
-if (!JWT_SECRET) {
+if (!process.env.JWT_SECRET) {
     throw new Error("FATAL ERROR: JWT_SECRET is not defined in environment variables.");
 }
+
+const JWT_SECRET = process.env.JWT_SECRET as Secret;;
 
 class AuthService {
     private saltRounds = 10; 
@@ -67,8 +68,8 @@ class AuthService {
         //Error at generating token
         const token = jwt.sign(
             {userId: user.id, username: user.username},
-            JWT_SECRET as string, 
-            { expiresIn: JWT_EXPIRES_IN }
+            JWT_SECRET as Secret, // Cast to Secret type    
+            // { expiresIn: JWT_EXPIRES_IN }
         );
 
         const { password: _, ...userWithoutPassword } = user;

@@ -1,130 +1,376 @@
-
+// --- Global Body Styles ---
+// Affects the entire page background and base font
 body {
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
     margin: 0;
-    padding: 0;
+    padding: 0; // Remove body padding, let containers handle it
+    min-height: 100vh;
+    color: #333; // Default text color
 }
 
+// --- Background Gradient Animation ---
 @keyframes gradient {
-    0% {
-        background-position: 0% 50%;
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+// --- Authentication View Container ---
+// Styles the container shown when the user is NOT authenticated
+.auth-container {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 450px; // Suitable for login/register forms
+    width: 90%;
+    margin: 50px auto; // Center vertically and horizontally
+}
+
+// --- Main Authenticated Application Container ---
+// Styles the main container shown when the user IS authenticated
+.main-app-container {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 900px; // Wider for application list
+    width: 90%;
+    margin: 30px auto; // Center it
+}
+
+// --- Application Header (Authenticated View) ---
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    h1 {
+      margin: 0;
+      font-size: 1.8rem; // Slightly larger title
     }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      span { // Style the welcome message
+        color: #555;
+      }
+      // Logout button styling will use general button classes below
     }
 }
 
-
-form {
+// --- General Form Styles (Login, Register, Application) ---
+form.auth-form,
+form.application-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    max-width: 400px;
-    margin: 20px auto;
+    gap: 18px;
+    padding: 20px; // Padding within the form itself
+    border: none;
+    border-radius: 8px; // Consistent border radius
+    background-color: transparent; // Form background is handled by container (.auth-container or .main-app-container)
+    width: 100%;
+    margin: 0 auto; // Center within its container if needed, but usually takes full width
+    box-shadow: none; // Remove shadow from form itself, container has it
 
-    h2 {
+    // --- Form Heading ---
+    h2, h3 {
         text-align: center;
+        margin-top: 0;
         margin-bottom: 20px;
         color: #333;
+        font-weight: 600;
     }
 
-    div { // Styles for input containers
+    // --- Input Field Containers ---
+    div:not(.button-group) { // Exclude button group div from this styling
         display: flex;
         flex-direction: column;
-        gap: 5px;
+        gap: 6px;
     }
 
+    // --- Field Labels ---
     label {
-        font-weight: bold;
-        margin-bottom: 3px;
-        color: #555;
+        font-weight: 500;
+        color: #444;
+        font-size: 0.95rem;
+        margin-bottom: 2px; // Small space below label
     }
 
+    // --- Input Fields (Text, Password, Date, URL, Textarea, Select) ---
     input[type="text"],
-    input[type="password"] {
-        padding: 10px;
+    input[type="password"],
+    input[type="date"],
+    input[type="url"],
+    textarea,
+    select {
+        padding: 12px 15px;
         border: 1px solid #ccc;
-        border-radius: 4px;
+        border-radius: 6px;
         font-size: 1rem;
+        color: #333;
+        background-color: #fff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
-        &:focus { // Nesting pseudo-classes
+        &:focus {
             outline: none;
             border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-    }
-
-    button[type="submit"] {
-        padding: 12px 15px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.2s ease-in-out;
-
-        &:hover:not(:disabled) {
-            background-color: #0056b3;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
         }
 
         &:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+             background-color: #e9ecef;
+             cursor: not-allowed;
         }
     }
 
-    p { // Paragraph containing the switch button
+    // --- Textarea Specific Styles ---
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    // --- Select Specific Styles ---
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+        padding-right: 2.5rem;
+    }
+
+    // --- Button Container (for side-by-side buttons like Save/Cancel) ---
+    .button-group {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        margin-top: 10px;
+        // Buttons inside will use general button classes
+    }
+
+    // --- Switch Form Link/Paragraph (Login/Register) ---
+    p.switch-form-text {
         text-align: center;
-        margin-top: 15px;
+        margin-top: 20px;
         font-size: 0.9rem;
         color: #555;
     }
 
-    /* Style for the switch button (using a specific class) */
+    // --- Switch Form Button/Link (Login/Register) ---
     button.switch-button {
         background: none;
         border: none;
         color: #007bff;
         cursor: pointer;
         text-decoration: underline;
-        padding: 0;
+        padding: 0 3px;
         font-size: 0.9rem;
+        vertical-align: baseline;
 
         &:hover {
             color: #0056b3;
+            text-decoration: none;
+        }
+         &:disabled {
+            color: #6c757d;
+            cursor: not-allowed;
+            text-decoration: none;
         }
     }
 
-    /* Style for error messages */
-    .error-message {
-        color: #dc3545;
-        background-color: #f8d7da;
-        border: 1px solid #f5c6cb;
-        padding: 10px;
-        border-radius: 4px;
+    // --- Error/Success Message Styling ---
+    .error-message, .success-message {
+        padding: 12px 15px;
+        border-radius: 6px;
         text-align: center;
         font-size: 0.9rem;
+        margin-top: 5px;
+        margin-bottom: 5px;
     }
 
-    /* Style for success messages */
+    .error-message {
+        color: #721c24;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+    }
+
     .success-message {
         color: #155724;
         background-color: #d4edda;
         border: 1px solid #c3e6cb;
-        padding: 10px;
-        border-radius: 4px;
-        text-align: center;
-        font-size: 0.9rem;
     }
+}
+
+// --- General Button Styles ---
+// --- General Button Styles ---
+button.button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    // Add filter and box-shadow to the transition
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    text-decoration: none; // Remove underline if used as a link
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px); // Slightly more lift on hover
+        // Make shadow slightly more prominent on hover
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        // Slightly brighten the button on hover
+        filter: brightness(1.1);
+    }
+
+    &:active:not(:disabled) {
+         transform: translateY(0px); // Reset lift on click
+         box-shadow: none; // Remove shadow on click
+         filter: brightness(0.95); // Slightly darken on click
+    }
+
+    // --- Clear Focus State (Accessibility) ---
+    &:focus-visible {
+        outline: 2px solid #0056b3; // Use a distinct outline color
+        outline-offset: 2px; // Offset outline so it doesn't overlap the button border
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); // Optional: keep a subtle glow as well
+    }
+
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.65; // Slightly more pronounced disabled opacity
+        // Reset transforms/filters if needed, though opacity usually suffices
+        transform: none;
+        box-shadow: none;
+        filter: none;
+    }
+
+    // --- Primary Button Style ---
+    &.button-primary {
+        background-color: #007bff;
+        color: white;
+        &:hover:not(:disabled) {
+            background-color: #0069d9; // Slightly different hover blue
+            // Inherits transform, box-shadow, filter from base .button:hover
+        }
+         &:active:not(:disabled) {
+             background-color: #0056b3; // Darker blue on active click
+         }
+        &:disabled {
+            background-color: #007bff; // Keep base color but rely on opacity
+        }
+    }
+
+    // --- Secondary Button Style (e.g., Cancel) ---
+    &.button-secondary {
+        background-color: #6c757d;
+        color: white;
+        &:hover:not(:disabled) { background-color: #5a6268; }
+        &:active:not(:disabled) { background-color: #545b62; }
+        &:disabled { background-color: #6c757d; }
+    }
+
+     // --- Danger Button Style (e.g., Delete) ---
+    &.button-danger {
+        background-color: #dc3545;
+        color: white;
+        &:hover:not(:disabled) { background-color: #c82333; }
+        &:active:not(:disabled) { background-color: #bd2130; }
+        &:disabled { background-color: #dc3545; }
+    }
+
+     // --- Warning Button Style (e.g., Edit) ---
+    &.button-warning {
+        background-color: #ffc107;
+        color: #212529;
+        &:hover:not(:disabled) { background-color: #e0a800; }
+        &:active:not(:disabled) { background-color: #d39e00; }
+        &:disabled { background-color: #ffc107; }
+    }
+
+     // --- Logout Button Style (can be secondary or custom) ---
+     &.button-logout {
+        background-color: #6c757d; // Example: using secondary style
+        color: white;
+        &:hover:not(:disabled) { background-color: #5a6268; }
+        &:active:not(:disabled) { background-color: #545b62; }
+     }
+}
+
+// ... rest of the styles (application list, etc.) ...
+
+
+// --- Application List Styles ---
+.application-list {
+    list-style: none; // Remove default bullet points
+    padding: 0;
+    margin-top: 25px; // Space above the list
+    display: flex;
+    flex-direction: column;
+    gap: 15px; // Space between list items
+}
+
+.application-list-item {
+    background-color: #fff; // White background for items
+    padding: 15px 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08); // Subtle shadow on hover
+    }
+
+    .details { // Container for text details
+        flex-grow: 1; // Allow details to take up available space
+        margin-right: 15px; // Space between details and buttons
+
+        strong { // Company Name
+            font-size: 1.1rem;
+            color: #333;
+            display: block; // Ensure it takes its own line if needed
+            margin-bottom: 3px;
+        }
+        span { // Job Title / Status
+            color: #555;
+        }
+        small { // Date
+            display: block; // Put date on its own line
+            margin-top: 5px;
+            color: #777;
+            font-size: 0.85rem;
+        }
+    }
+
+    .actions { // Container for buttons
+        display: flex;
+        gap: 10px; // Space between Edit/Delete buttons
+        flex-shrink: 0; // Prevent buttons from shrinking
+        // Buttons use general .button classes
+    }
+}
+
+// --- Loading/Empty State ---
+.loading-text, .empty-list-text {
+    text-align: center;
+    color: #666;
+    padding: 30px;
+    font-style: italic;
 }
