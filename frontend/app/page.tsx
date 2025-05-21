@@ -1,187 +1,89 @@
-"use client"; 
+"use client";
 import React, { useState, useEffect } from "react";
-import { getApplications, deleteApplication } from "./services/api"; 
-import LoginForm from "./components/LoginForm"; 
-import RegisterForm from "./components/RegisterForm"; 
-import { useAuth } from "./services/AuthContext";
-import ApplicationForm from "./components/ApplicationForm";
-import type { Application } from "./components/ApplicationForm"; 
-import "../app/styles/AuthForms.scss"; 
+import { getApplications, deleteApplication } from "./lib/api/api";
+import { useAuth } from "./context/AuthContext";
+import LoginForm from "./components/auth/LoginForm";
+import RegisterForm from "./components/auth/RegisterForm";
+import ApplicationForm from "./components/interface/ApplicationForm";
+import StartingPage from "./components/interface/StartingPage";
+import type { Application } from "./components/interface/ApplicationForm";
+import "../app/styles/AuthForms.scss";
 
 export default function HomePage() {
-  const [editingApplication, setEditingApplication] =
-    useState<Application | null>(null);
-  const { isAuthenticated, user, logout, isLoading: isAuthLoading } = useAuth();
-  const [showAddForm, setShowAddForm] = useState<boolean>(false);
+  const [editingApp, setEditingApp] = useState<Application | null>(null);
+  const [showStartingPage, setShowStartingPage] = useState(true);
+  const [showLoginForm, setShowLoginForm] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [applications, setApplications] = useState<Application[]>([]);
-  const [dataLoading, setDataLoading] = useState<boolean>(false); 
-  const [error, setError] = useState<string | null>(null); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [showLogin, setShowLogin] = useState<boolean>(true);
+  const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
 
+  // Load applications when authenticated
   useEffect(() => {
-    if (isAuthLoading) {
-      return;
-    }
-
-    // Define the async function to fetch data
-    const fetchApplications = async () => {
-      setDataLoading(true);
+    const fetchApps = async () => {
+      setIsLoading(true);
       setError(null);
       try {
-        console.log("Attempting to fetch applications...");
         const data = await getApplications();
         setApplications(data);
       } catch (err: any) {
-        console.error("Error fetching applications:", err);
-        if (err.response && err.response.status === 401) {
-          setError("Your session may have expired. Please log in again.");
+        if (err.response?.status === 401) {
+          setError("Session expired. Please log in again.");
           logout();
         } else {
-          setError(err.message || "Failed to fetch applications.");
+          setError(err.message || "Failed to load applications.");
         }
         setApplications([]);
       } finally {
-        setDataLoading(false);
+        setIsLoading(false);
       }
     };
 
     if (isAuthenticated) {
-      fetchApplications();
+      fetchApps();
     } else {
       setApplications([]);
       setError(null);
-      setDataLoading(false);
+      setIsLoading(false);
     }
-  }, [isAuthenticated, isAuthLoading, logout]);
+  }, [isAuthenticated, logout]);
 
-  // Function to handle the successful creation of a new application
-  const handleApplicationCreated = (newApplication: Application) => {
-    setApplications((prevApps) => [newApplication, ...prevApps]);
-    setShowAddForm(false);
-    console.log("New application added to the list:", newApplication);
-  };
+  // Early returns
+  if (authLoading) return <p>Loading session...</p>;
 
-// Function to handle the delete button click
-const handleDeleteApplication = async (id: number) => {
-  if (
-      !window.confirm(
-          `Are you sure you want to delete this application (ID: ${id})?`
-      )
-  ) {
-      return; 
-  }
-  setError(null);
-
-  console.log(`Attempting to delete application ID: ${id}`); 
-
-  try {
-      await deleteApplication(id);
-      console.log(`API call for delete ID: ${id} completed.`);
-
-      setApplications((prevApps) => {
-          console.log('Current applications state:', prevApps);
-          const nextApps = prevApps.filter((app) => app.id !== id);
-          console.log('New applications state (after filter):', nextApps); 
-          return nextApps; 
-      });
-
-      console.log(`Application with ID ${id} deleted successfully from state.`);
-
-  } catch (err: any) {
-      console.error(`Failed to delete application with ID ${id}:`, err); 
-      console.error('Error status:', err.response?.status); 
-      console.error('Error data:', err.response?.data);   
-
-      let errorMsg = `Failed to delete application.`;
-      if (err.response?.status === 404 || err.message?.includes('not found')) {
-          errorMsg = `Failed to delete: Application with ID ${id} not found. It may have already been deleted.`;
-      
-      } else {
-          errorMsg = err.response?.data?.message || err.message || errorMsg;
-      }
-      setError(errorMsg); 
-  }
-};
-  const handleCancelAddForm = () => {
-    setShowAddForm(false);
-  };
-  const switchToRegister = () => {
-    setError(null);
-    setShowLogin(false);
-  };
-  const switchToLogin = () => {
-    setError(null);
-    setShowLogin(true);
-  };
-  const handleRegisterSuccess = () => {
-    alert("Registration successful! Please log in.");
-    setShowLogin(true);
-  };
-  const handleLoginSuccess = () => {
-    setError(null);
-    console.log("Login successful handler called in HomePage.");
-  };
-
-  const handleEditClick = (application: Application) => {
-    setEditingApplication(application);
-    setShowAddForm(false);
-  };
-  const handleUpdateSuccess = (updatedApplication: Application) => {
-    setApplications((prevApps) =>
-      prevApps.map((app) =>
-        app.id === updatedApplication.id ? updatedApplication : app
-      )
-    );
-    setEditingApplication(null);
-    console.log(
-      "Application updated successfully in list:",
-      updatedApplication
-    );
-  };
-  const handleCancelEdit = () => {
-    setEditingApplication(null);
-  };
-  const handleApplicationUpdated = (updatedApplication: Application) => {
-    setApplications((prevApps) =>
-      prevApps.map((app) =>
-        app.id === updatedApplication.id ? updatedApplication : app
-      )
-    );
-    setEditingApplication(null);
-    console.log(
-      "Application updated successfully in list:",
-      updatedApplication
-    );
-  };
-
-  if (isAuthLoading) {
+  if (showStartingPage) {
     return (
-      <div >
-        <p>Loading session...</p>
+      <div className="auth-container">
+        <StartingPage
+          onNavigateToLogin={() => {
+            setShowStartingPage(false);
+            setShowLoginForm(true);
+          }}
+          onNavigateToRegister={() => {
+            setShowStartingPage(false);
+            setShowLoginForm(false);
+          }}
+        />
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div
-      >
+      <div className="auth-container">
         <h2>Welcome</h2>
         {error && <p>Error: {error}</p>}
-
-        {showLogin ? (
+        {showLoginForm ? (
           <>
             <LoginForm
-              onLoginSuccess={handleLoginSuccess}
-              switchToRegister={switchToRegister}
+              onLoginSuccess={() => setError(null)}
+              switchToRegister={() => setShowLoginForm(false)}
             />
-            <p >
+            <p>
               Don't have an account?{" "}
-              <button
-                onClick={switchToRegister}
-               
-              >
+              <button className="switch-button" onClick={() => setShowLoginForm(false)}>
                 Register here
               </button>
             </p>
@@ -189,14 +91,15 @@ const handleDeleteApplication = async (id: number) => {
         ) : (
           <>
             <RegisterForm
-              onRegisterSuccess={handleRegisterSuccess}
-              switchToLogin={switchToLogin}
+              onRegisterSuccess={() => {
+                alert("Registration successful! Please log in.");
+                setShowLoginForm(true);
+              }}
+              switchToLogin={() => setShowLoginForm(true)}
             />
-            <p >
+            <p>
               Already have an account?{" "}
-              <button
-                onClick={switchToLogin}
-              >
+              <button className="switch-button" onClick={() => setShowLoginForm(true)}>
                 Login here
               </button>
             </p>
@@ -206,101 +109,97 @@ const handleDeleteApplication = async (id: number) => {
     );
   }
 
+  // Authenticated UI
   return (
-    <div>
-      <div className="main-app-container">
-        <header className="app-header">
+    <div className="main-app-container">
+      <header className="app-header">
         <h1>Job Applications</h1>
         <div className="user-info">
           <span>Welcome, {user?.username || "User"}!</span>
-          <button onClick={logout}>
-            Logout
-          </button>
+          <button onClick={logout}>Logout</button>
         </div>
-        </header>
-      </div>
+      </header>
 
-      {!showAddForm && !editingApplication && (
+      {!showAddForm && !editingApp && (
         <button
+          className="primary-button"
           onClick={() => {
             setShowAddForm(true);
-            setEditingApplication(null);
+            setEditingApp(null);
             setError(null);
           }}
-        className="primary-button"
         >
           + Add New Application
         </button>
       )}
-      {showAddForm && !editingApplication && (
+
+      {showAddForm && !editingApp && (
         <ApplicationForm
-          onSuccess={handleApplicationCreated} 
-          onCancel={handleCancelAddForm}
+          onSuccess={(newApp) => {
+            setApplications((prev) => [newApp, ...prev]);
+            setShowAddForm(false);
+          }}
+          onCancel={() => setShowAddForm(false)}
         />
       )}
-      {editingApplication && (
+
+      {editingApp && (
         <ApplicationForm
-          key={editingApplication.id}
-          initialData={editingApplication}
-          onSuccess={handleApplicationUpdated}
-          onCancel={handleCancelEdit}
+          key={editingApp.id}
+          initialData={editingApp}
+          onSuccess={(updatedApp) => {
+            setApplications((prev) =>
+              prev.map((app) => (app.id === updatedApp.id ? updatedApp : app))
+            );
+            setEditingApp(null);
+          }}
+          onCancel={() => setEditingApp(null)}
         />
       )}
 
       <h2>Your Applications</h2>
+      {isLoading && <p>Loading applications...</p>}
+      {error && !isLoading && <p>Error: {error}</p>}
 
-      {/* Data Loading State */}
-      {dataLoading && <p>Loading applications...</p>}
-
-      {/* Error State (only show if not loading) */}
-      {error && !dataLoading && <p>Error: {error}</p>}
-
-      {!dataLoading && !error && (
+      {!isLoading && !error && (
         <ul>
-          {applications.length > 0 ? (
+          {applications.length ? (
             applications.map((app) => (
-              <li
-                key={app.id}
-                
-              >
+              <li key={app.id}>
+                <strong>{app.company_name}</strong> - {app.job_title} ({app.status})
+                <br />
+                <small>
+                  Applied on:{" "}
+                  {app.application_date
+                    ? new Date(app.application_date).toLocaleDateString()
+                    : "N/A"}
+                </small>
                 <div>
-                  {" "}
-                  {/* Group application details */}
-                  <strong>{app.company_name}</strong> - {app.job_title} (
-                  {app.status})
-                  <br />
-                  <small>
-                    Applied on:{" "}
-                    {/* Check if app.application_date exists before creating Date */}
-                    {
-                      app.application_date
-                        ? new Date(app.application_date).toLocaleDateString()
-                        : "N/A"
-                    }
-                  </small>
-                  {/* TODO: Add more details if needed */}
-                </div>
-                <div>
-                  <button
-                    onClick={() => handleEditClick(app)} 
-                   
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteApplication(app.id)}
-                   
-                  >
-                    Delete
-                  </button>
+                  <button onClick={() => setEditingApp(app)}>Edit</button>
+                  <button onClick={() => handleDelete(app.id)}>Delete</button>
                 </div>
               </li>
             ))
           ) : (
-            <p>You haven't tracked any applications yet. Add your first one!</p>
+            <p>You haven't tracked any applications yet.</p>
           )}
         </ul>
       )}
     </div>
   );
+
+  // Delete handler
+  async function handleDelete(id: number) {
+    if (!window.confirm(`Delete application ID ${id}?`)) return;
+    try {
+      await deleteApplication(id);
+      setApplications((prev) => prev.filter((app) => app.id !== id));
+    } catch (err: any) {
+      const message =
+        err.response?.status === 404
+          ? `Application not found (ID ${id}).`
+          : err.response?.data?.message || "Failed to delete application.";
+      setError(message);
+    }
+  }
 }

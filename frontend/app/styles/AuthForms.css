@@ -1,0 +1,376 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: #333;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.auth-container {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 450px;
+  width: 90%;
+  margin: 50px auto;
+}
+
+.main-app-container {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  width: 90%;
+  margin: 30px auto;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.app-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+.app-header .user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.app-header .user-info span {
+  color: #555;
+}
+
+form.auth-form,
+form.application-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: none;
+}
+form.auth-form h2, form.auth-form h3,
+form.application-form h2,
+form.application-form h3 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 600;
+}
+form.auth-form div:not(.button-group),
+form.application-form div:not(.button-group) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+form.auth-form label,
+form.application-form label {
+  font-weight: 500;
+  color: #444;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+form.auth-form input[type=text],
+form.auth-form input[type=password],
+form.auth-form input[type=date],
+form.auth-form input[type=url],
+form.auth-form textarea,
+form.auth-form select,
+form.application-form input[type=text],
+form.application-form input[type=password],
+form.application-form input[type=date],
+form.application-form input[type=url],
+form.application-form textarea,
+form.application-form select {
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #333;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+form.auth-form input[type=text]:focus,
+form.auth-form input[type=password]:focus,
+form.auth-form input[type=date]:focus,
+form.auth-form input[type=url]:focus,
+form.auth-form textarea:focus,
+form.auth-form select:focus,
+form.application-form input[type=text]:focus,
+form.application-form input[type=password]:focus,
+form.application-form input[type=date]:focus,
+form.application-form input[type=url]:focus,
+form.application-form textarea:focus,
+form.application-form select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+form.auth-form input[type=text]:disabled,
+form.auth-form input[type=password]:disabled,
+form.auth-form input[type=date]:disabled,
+form.auth-form input[type=url]:disabled,
+form.auth-form textarea:disabled,
+form.auth-form select:disabled,
+form.application-form input[type=text]:disabled,
+form.application-form input[type=password]:disabled,
+form.application-form input[type=date]:disabled,
+form.application-form input[type=url]:disabled,
+form.application-form textarea:disabled,
+form.application-form select:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+form.auth-form textarea,
+form.application-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+form.auth-form select,
+form.application-form select {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  padding-right: 2.5rem;
+}
+form.auth-form .button-group,
+form.application-form .button-group {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 10px;
+}
+form.auth-form p.switch-form-text,
+form.application-form p.switch-form-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #555;
+}
+form.auth-form button.switch-button,
+form.application-form button.switch-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0 3px;
+  font-size: 0.9rem;
+  vertical-align: baseline;
+}
+form.auth-form button.switch-button:hover,
+form.application-form button.switch-button:hover {
+  color: #0056b3;
+  text-decoration: none;
+}
+form.auth-form button.switch-button:disabled,
+form.application-form button.switch-button:disabled {
+  color: #6c757d;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+form.auth-form .error-message, form.auth-form .success-message,
+form.application-form .error-message,
+form.application-form .success-message {
+  padding: 12px 15px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+form.auth-form .error-message,
+form.application-form .error-message {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+form.auth-form .success-message,
+form.application-form .success-message {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+button.button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  text-decoration: none;
+}
+button.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.1);
+}
+button.button:active:not(:disabled) {
+  transform: translateY(0px);
+  box-shadow: none;
+  filter: brightness(0.95);
+}
+button.button:focus-visible {
+  outline: 2px solid #0056b3;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+button.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+button.button.button-primary {
+  background-color: #007bff;
+  color: white;
+}
+button.button.button-primary:hover:not(:disabled) {
+  background-color: #0069d9;
+}
+button.button.button-primary:active:not(:disabled) {
+  background-color: #0056b3;
+}
+button.button.button-primary:disabled {
+  background-color: #007bff;
+}
+button.button.button-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+button.button.button-secondary:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+button.button.button-secondary:active:not(:disabled) {
+  background-color: #545b62;
+}
+button.button.button-secondary:disabled {
+  background-color: #6c757d;
+}
+button.button.button-danger {
+  background-color: #dc3545;
+  color: white;
+}
+button.button.button-danger:hover:not(:disabled) {
+  background-color: #c82333;
+}
+button.button.button-danger:active:not(:disabled) {
+  background-color: #bd2130;
+}
+button.button.button-danger:disabled {
+  background-color: #dc3545;
+}
+button.button.button-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+button.button.button-warning:hover:not(:disabled) {
+  background-color: #e0a800;
+}
+button.button.button-warning:active:not(:disabled) {
+  background-color: #d39e00;
+}
+button.button.button-warning:disabled {
+  background-color: #ffc107;
+}
+button.button.button-logout {
+  background-color: #6c757d;
+  color: white;
+}
+button.button.button-logout:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+button.button.button-logout:active:not(:disabled) {
+  background-color: #545b62;
+}
+
+.application-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.application-list-item {
+  background-color: #fff;
+  padding: 15px 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.2s ease;
+}
+.application-list-item:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+.application-list-item .details {
+  flex-grow: 1;
+  margin-right: 15px;
+}
+.application-list-item .details strong {
+  font-size: 1.1rem;
+  color: #333;
+  display: block;
+  margin-bottom: 3px;
+}
+.application-list-item .details span {
+  color: #555;
+}
+.application-list-item .details small {
+  display: block;
+  margin-top: 5px;
+  color: #777;
+  font-size: 0.85rem;
+}
+.application-list-item .actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.loading-text, .empty-list-text {
+  text-align: center;
+  color: #666;
+  padding: 30px;
+  font-style: italic;
+}/*# sourceMappingURL=AuthForms.css.map */

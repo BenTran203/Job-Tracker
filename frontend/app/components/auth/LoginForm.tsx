@@ -1,6 +1,7 @@
-import '../styles/AuthForms.scss'; 
+import '../../styles/AuthForms.scss'; 
+import '../../styles/AuthPages.scss'; 
 import React, { useState, FormEvent } from 'react';
-import { loginUser } from '../services/api'; // Adjust path as needed
+import { loginUser } from '../../lib/api/api'; // Adjust path as needed
 
 interface LoginFormProps {
     onLoginSuccess: () => void; // Callback function for successful login
@@ -42,10 +43,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, switchToRegister 
             <h2>Login</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <div>
-                <label htmlFor="login-username">Username:</label>
+                <label htmlFor="login-username" className="username" >Username:</label>
                 <input
                     type="text"
                     id="login-username"
+                    className="login-username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -53,10 +55,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, switchToRegister 
                 />
             </div>
             <div>
-                <label htmlFor="login-password">Password:</label>
+                <label htmlFor="login-password" className="password" >Password:</label>
                 <input
                     type="password"
                     id="login-password"
+                    className="login-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required

@@ -2,7 +2,7 @@
 
 import React, { useState, FormEvent, useEffect } from 'react';
 // Import both create and update API functions
-import { createApplication, updateApplication } from '../services/api'; // Adjust path if needed
+import { createApplication, updateApplication } from '../../lib/api/api'; // Adjust path if needed
 
 interface ApplicationFormData {
     company_name: string;

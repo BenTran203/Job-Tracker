@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { loginUser as apiLogin, logoutUser as apiLogout } from '../services/api'; // Assuming api.ts exports these
+import { loginUser as apiLogin, logoutUser as apiLogout } from '../lib/api/api'; // Assuming api.ts exports these
 
 interface User {
     id: number;

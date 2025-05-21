@@ -1,0 +1,86 @@
+@charset "UTF-8";
+.auth-container {
+  /* center the form in the page */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+  background: #f5f5f5;
+}
+
+.auth-container form {
+  /* turn the form itself into a “card” */
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+/* Title */
+.auth-container form h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+/* Error message (you’re currently inlined, but this will catch any <p> above the first field) */
+.auth-container form p[style] {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #d32f2f;
+}
+
+/* Labels */
+.username,
+.password {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+/* Inputs */
+.login-username,
+.login-password {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-username:focus,
+.login-password:focus {
+  outline: none;
+  border-color: #3f51b5;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+}
+
+/* Submit button */
+.auth-container form > button[type=submit] {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #3f51b5;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auth-container form > button[type=submit]:hover:not(:disabled) {
+  background-color: #303f9f;
+}
+
+.auth-container form > button[type=submit]:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}/*# sourceMappingURL=AuthPages.css.map */
